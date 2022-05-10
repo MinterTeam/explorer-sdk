@@ -15,7 +15,7 @@ const (
 )
 
 type Coin struct {
-	ID               uint           `json:"id"         pg:",use_zero"`
+	ID               uint           `json:"id"         bun:"id,pk"`
 	Type             CoinType       `json:"type"`
 	Name             string         `json:"name"`
 	Symbol           string         `json:"symbol"`

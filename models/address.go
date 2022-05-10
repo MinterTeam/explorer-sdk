@@ -1,7 +1,7 @@
 package models
 
 type Address struct {
-	ID                  uint                  `json:"id"                   bun:",pk"`
+	ID                  uint                  `json:"id"                   bun:"id,pk"`
 	Address             string                `json:"address"              bun:"type:varchar(64)"`
 	Balances            []*Balance            `json:"balances"             bun:"rel:has-many"` //relation has many to Balances
 	Rewards             []*Reward             `json:"rewards"              bun:"rel:has-many"` //relation has many to Rewards

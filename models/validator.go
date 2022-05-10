@@ -8,7 +8,7 @@ const ValidatorStatusNotReady = 1
 const ValidatorStatusReady = 2
 
 type Validator struct {
-	ID                   uint                  `json:"id" bun:",pk"`
+	ID                   uint                  `json:"id" bun:"id,pk"`
 	RewardAddressID      *uint                 `json:"reward_address_id"`
 	OwnerAddressID       *uint                 `json:"owner_address_id"`
 	ControlAddressID     *uint                 `json:"control_address_id"`

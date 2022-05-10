@@ -6,7 +6,7 @@ import (
 )
 
 type Stake struct {
-	ID             uint       `json:"id"               bun:",pk"`
+	ID             uint       `json:"id"               bun:"id,pk"`
 	OwnerAddressID uint       `json:"owner_address_id"`
 	ValidatorID    uint       `json:"validator_id"`
 	CoinID         uint       `json:"coin_id"          pg:",use_zero"`
