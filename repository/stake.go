@@ -8,41 +8,14 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
-func (rStake *StakeRepository) GetDelegatorsCount() (uint64, error) {
-	var count uint64
-	err := rStake.db.
-		NewSelect().
-		Model((*models.Stake)(nil)).
-		ColumnExpr("count (DISTINCT owner_address_id)").
-		Scan(context.Background(), &count)
-	return count, err
-}
-
-func (rStake *StakeRepository) DeleteStakesNotInListIds(idList []uint64) error {
-	_, err := rStake.db.
-		NewDelete().
-		Model((*models.Stake)(nil)).
-		Where("id not in (?)", bun.In(idList)).
-		Where("is_kicked != true", bun.In(idList)).
-		Exec(context.Background())
-	return err
-}
-
-func (rStake *StakeRepository) DeleteStakesByValidatorIds(idList []uint64) error {
-	_, err := rStake.db.
-		NewDelete().
-		Model((*models.Stake)(nil)).
-		Where("validator_id in (?)", bun.In(idList)).
-		Exec(context.Background())
-	return err
-}
-
-func (rStake *StakeRepository) SaveAllStakes(stakes []*models.Stake) error {
+func (rStake *StakeRepository) InsertOrUpdateStakes(stakes []models.Stake) ([]models.Stake, error) {
+	list := stakes
 	_, err := rStake.db.NewInsert().
-		Model(&stakes).
-		On("CONFLICT (owner_address_id, validator_id, coin_id) DO UPDATE").
+		Model(&list).
+		On("CONFLICT (owner_address_id, validator_id, coin_id, is_kicked) DO UPDATE").
+		Set("value = EXCLUDED.value, bip_value = EXCLUDED.bip_value").
 		Exec(context.Background())
-	return err
+	return list, err
 }
 
 type StakeRepository struct {

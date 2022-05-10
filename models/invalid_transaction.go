@@ -20,10 +20,10 @@ type InvalidTransaction struct {
 	Tags                map[string]string `json:"tags"`
 	Payload             []byte            `json:"payload"`
 	RawTx               []byte            `json:"raw_tx"`
-	Block               *Block            `bun:"rel:has-one"`                    //Relation has one to Blocks
-	FromAddress         *Address          `bun:"rel:has-one,fk:from_address_id"` //Relation has one to Addresses
-	GasCoin             *Coin             `json:"gas_coin"                 bun:"rel:has-one,join:gas_coin_id=id"`
-	CommissionPriceCoin interface{}       `json:"commission_price_coin"    bun:"-"`
+	Block               *Block            `json:"block"                 bun:"rel:belongs-to"`                         //Relation has one to Blocks
+	FromAddress         *Address          `json:"from_address"          bun:"rel:belongs-to,join:from_address_id=id"` //Relation has one to Addresses
+	GasCoin             *Coin             `json:"gas_coin"              bun:"rel:belongs-to,join:gas_coin_id=id"`
+	CommissionPriceCoin interface{}       `json:"commission_price_coin" bun:"-"`
 }
 
 // GetHash Return transactions hash with prefix

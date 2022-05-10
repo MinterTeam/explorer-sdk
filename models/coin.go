@@ -15,7 +15,7 @@ const (
 )
 
 type Coin struct {
-	ID               uint           `json:"id" pg:",use_zero"`
+	ID               uint           `json:"id"         pg:",use_zero"`
 	Type             CoinType       `json:"type"`
 	Name             string         `json:"name"`
 	Symbol           string         `json:"symbol"`
@@ -24,22 +24,22 @@ type Coin struct {
 	Reserve          string         `json:"reserve"    bun:"type:numeric(70)"`
 	MaxSupply        string         `json:"max_supply" bun:"type:numeric(70)"`
 	Version          uint           `json:"version"    pg:",use_zero"`
-	OwnerAddressId   uint           `json:"owner_address"`
+	OwnerAddressId   uint           `json:"owner_address_id"`
 	CreatedAtBlockId uint           `json:"created_at_block_id"`
 	Burnable         bool           `json:"burnable"`
 	Mintable         bool           `json:"mintable"`
 	CreatedAt        time.Time      `json:"created_at"`
 	UpdatedAt        *time.Time     `json:"updated_at"`
 	DeletedAt        *time.Time     `bun:",soft_delete"`
-	OwnerAddress     Address        `bun:"rel:has-one"`
+	OwnerAddress     *Address       `bun:"rel:belongs-to,join:owner_address_id=id"`
+	CreatedAtBlock   *Block         `bun:"rel:belongs-to,join:created_at_block_id=id"`
 	Contracts        *TokenContract `bun:"rel:has-one"`
 }
 
-// Return coin with version
+// GetSymbol Return coin with version
 func (c *Coin) GetSymbol() string {
 	if c.Version == 0 {
 		return c.Symbol
 	}
-
 	return fmt.Sprintf("%s-%d", c.Symbol, c.Version)
 }

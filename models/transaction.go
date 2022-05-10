@@ -24,18 +24,20 @@ type Transaction struct {
 	Payload             []byte               `json:"payload"`
 	RawTx               []byte               `json:"raw_tx"`
 	CommissionPriceCoin interface{}          `json:"commission_price_coin" bun:"-"`
-	Block               *Block               `json:"block"        bun:"rel:belongs-to"`                         //Relation has one to Blocks
-	FromAddress         *Address             `json:"from_address" bun:"rel:belongs-to,join:from_address_id=id"` //Relation has one to Address
-	GasCoin             *Coin                `json:"gas_coin"     bun:"rel:has-one,fk:gas_coin_id"`             //Relation has one to Coin
-	Validators          []*Validator         `json:"validators"   bun:"many2many:transaction_validator"`        //Relation has many to Validators
-	TxOutputs           []*TransactionOutput `json:"tx_outputs"   bun:"rel:has-many,fk:id"`
-	TxOutput            *TransactionOutput   `json:"tx_output"    bun:"rel:has-one,fk:id"`
+	Block               *Block               `json:"block"        bun:"rel:belongs-to"`                                       //Relation has one to Blocks
+	FromAddress         *Address             `json:"from_address" bun:"rel:belongs-to,join:from_address_id=id"`               //Relation has one to Address
+	GasCoin             *Coin                `json:"gas_coin"     bun:"rel:belongs-to,join:gas_coin_id=id"`                   //Relation has one to Coin
+	Validators          []*Validator         `json:"validators"   bun:"m2m:transaction_validator,join:Transaction=Validator"` //Relation has many to Validators
+	TxOutputs           []*TransactionOutput `json:"tx_outputs"   bun:"rel:has-many"`
+	TxOutput            *TransactionOutput   `json:"tx_output"    bun:"rel:has-one"`
 }
 
 type TransactionValidator struct {
-	tableName     struct{} `pg:"transaction_validator"`
-	TransactionID uint64
-	ValidatorID   uint64
+	//tableName     struct{}     `pg:"transaction_validator"`
+	TransactionID uint64       `bun:",pk"`
+	Transaction   *Transaction `bun:"rel:belongs-to,join:transaction_id=id"`
+	ValidatorID   uint64       `bun:",pk"`
+	Validator     *Validator   `bun:"rel:belongs-to,join:validator_id=id"`
 }
 
 type TransactionLiquidityPool struct {
@@ -44,92 +46,12 @@ type TransactionLiquidityPool struct {
 	LiquidityPoolID uint64
 }
 
-type SendTxData struct {
-	Coin  string `json:"coin"`
-	To    string `json:"to"`
-	Value string `json:"value"`
-}
-
-type SellCoinTxData struct {
-	CoinToSell        string `json:"coin_to_sell"`
-	ValueToSell       string `json:"value_to_sell"`
-	CoinToBuy         string `json:"coin_to_buy"`
-	MinimumValueToBuy string `json:"minimum_value_to_buy"`
-}
-
-type SellAllCoinTxData struct {
-	CoinToSell        string `json:"coin_to_sell"`
-	CoinToBuy         string `json:"coin_to_buy"`
-	MinimumValueToBuy string `json:"minimum_value_to_buy"`
-}
-
-type BuyCoinTxData struct {
-	CoinToBuy          string `json:"coin_to_buy"`
-	ValueToBuy         string `json:"value_to_buy"`
-	CoinToSell         string `json:"coin_to_sell"`
-	MaximumValueToSell string `json:"maximum_value_to_sell"`
-}
-
-type CreateCoinTxData struct {
-	Name                 string `json:"name"`
-	Symbol               string `json:"symbol"`
-	InitialAmount        string `json:"initial_amount"`
-	InitialReserve       string `json:"initial_reserve"`
-	ConstantReserveRatio string `json:"constant_reserve_ratio"`
-	MaxSupply            string `json:"max_supply"`
-}
-
-type DeclareCandidacyTxData struct {
-	Address    string `json:"address"`
-	PubKey     string `json:"pub_key"`
-	Commission string `json:"commission"`
-	Coin       string `json:"coin"`
-	Stake      string `json:"stake"`
-}
-
-type DelegateTxData struct {
-	PubKey string `json:"pub_key"`
-	Coin   string `json:"coin"`
-	Value  string `json:"value"`
-}
-
-type UnbondTxData struct {
-	PubKey string `json:"pub_key"`
-	Coin   string `json:"coin"`
-	Value  string `json:"value"`
-}
-
-type RedeemCheckTxData struct {
-	RawCheck string `json:"raw_check"`
-	Proof    string `json:"proof"`
-}
-
-type SetCandidateTxData struct {
-	PubKey string `json:"pub_key"`
-}
-
-type EditCandidateTxData struct {
-	PubKey        string `json:"pub_key"`
-	RewardAddress string `json:"reward_address"`
-	OwnerAddress  string `json:"owner_address"`
-}
-
-type CreateMultisigTxData struct {
-	Threshold string   `json:"threshold"`
-	Weights   []string `json:"weights"`
-	Addresses []string `json:"addresses"`
-}
-
-type MultiSendTxData struct {
-	List []SendTxData `json:"list"`
-}
-
-//Return fee for transaction
+// GetFee Return fee for transaction
 func (t *Transaction) GetFee() uint64 {
 	return t.GasPrice * t.Gas
 }
 
-//Return transactions hash with prefix
+// GetHash Return transactions hash with prefix
 func (t *Transaction) GetHash() string {
 	return `Mt` + t.Hash
 }
