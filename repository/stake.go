@@ -8,6 +8,14 @@ import (
 	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
+func (rStake *StakeRepository) TruncateStakeTable() error {
+	_, err := rStake.db.NewTruncateTable().
+		Model((*models.Stake)(nil)).
+		Restrict().
+		Exec(context.Background())
+	return err
+}
+
 func (rStake *StakeRepository) InsertOrUpdateStakes(stakes []models.Stake) ([]models.Stake, error) {
 	list := stakes
 	_, err := rStake.db.NewInsert().
