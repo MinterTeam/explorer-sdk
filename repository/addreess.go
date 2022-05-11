@@ -68,8 +68,8 @@ func (rAddress *AddressRepository) UpdateCache() error {
 	rAddress.addressCache = new(sync.Map)
 
 	for _, a := range address {
-		rAddress.idCache.Store(a.ID, a.Address)
-		rAddress.addressCache.Store(a.Address, address)
+		rAddress.idCache.Store(a.ID, a)
+		rAddress.addressCache.Store(a.Address, a)
 	}
 	return nil
 }
