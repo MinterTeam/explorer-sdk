@@ -53,6 +53,34 @@ func (rAddress *AddressRepository) GetById(id uint) (models.Address, error) {
 	return address, nil
 }
 
+func (rAddress *AddressRepository) UpdateCache() error {
+	var address []models.Address
+	err := rAddress.db.
+		NewSelect().
+		Model(&address).
+		Scan(context.Background())
+
+	if err != nil {
+		return err
+	}
+
+	rAddress.idCache = new(sync.Map)
+	rAddress.addressCache = new(sync.Map)
+
+	for _, a := range address {
+		rAddress.idCache.Store(a.ID, a.Address)
+		rAddress.addressCache.Store(a.Address, address)
+	}
+	return nil
+}
+
+func (rAddress *AddressRepository) Init() {
+	err := rAddress.UpdateCache()
+	if err != nil {
+		println(err)
+	}
+}
+
 type AddressRepository struct {
 	db           *bun.DB
 	idCache      *sync.Map

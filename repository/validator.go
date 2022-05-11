@@ -32,6 +32,33 @@ func (rValidator *ValidatorRepository) FindByPk(pk string) (models.Validator, er
 	return *vpk.Validator, nil
 }
 
+func (rValidator *ValidatorRepository) UpdateCache() error {
+	var list []models.ValidatorPublicKeys
+	err := rValidator.db.
+		NewSelect().
+		Model(&list).
+		Relation("Validator").
+		Scan(context.Background())
+
+	if err != nil {
+		return err
+	}
+	rValidator.pkCache = new(sync.Map)
+	for _, v := range list {
+		if v.Validator != nil {
+			rValidator.pkCache.Store(v.ID, v.Validator)
+		}
+	}
+	return nil
+}
+
+func (rValidator *ValidatorRepository) Init() {
+	err := rValidator.UpdateCache()
+	if err != nil {
+		println(err)
+	}
+}
+
 type ValidatorRepository struct {
 	pkCache *sync.Map
 	db      *bun.DB
