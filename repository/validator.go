@@ -46,7 +46,7 @@ func (rValidator *ValidatorRepository) UpdateCache() error {
 	rValidator.pkCache = new(sync.Map)
 	for _, v := range list {
 		if v.Validator != nil {
-			rValidator.pkCache.Store(v.ID, v.Validator)
+			rValidator.pkCache.Store(v.Key, v.Validator)
 		}
 	}
 	return nil
