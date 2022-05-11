@@ -6,6 +6,7 @@ import (
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
+	"math"
 	"sync"
 )
 
@@ -54,10 +55,10 @@ func (rAddress *AddressRepository) GetById(id uint) (models.Address, error) {
 }
 
 func (rAddress *AddressRepository) UpdateCache() error {
-	var address []models.Address
+	var addresses []models.Address
 	err := rAddress.db.
 		NewSelect().
-		Model(&address).
+		Model(&addresses).
 		Scan(context.Background())
 
 	if err != nil {
@@ -67,10 +68,29 @@ func (rAddress *AddressRepository) UpdateCache() error {
 	rAddress.idCache = new(sync.Map)
 	rAddress.addressCache = new(sync.Map)
 
-	for _, a := range address {
-		rAddress.idCache.Store(a.ID, a)
-		rAddress.addressCache.Store(a.Address, a)
+	chunkSize := 5000
+	wg := new(sync.WaitGroup)
+
+	chunksCount := int(math.Ceil(float64(len(addresses)) / float64(chunkSize)))
+	wg.Add(chunksCount)
+
+	for i := 0; i < chunksCount; i++ {
+		start := chunkSize * i
+		end := start + chunkSize
+		if end > len(addresses) {
+			end = len(addresses)
+		}
+		go func(list []models.Address) {
+			for _, a := range list {
+				rAddress.idCache.Store(a.ID, a)
+				rAddress.addressCache.Store(a.Address, a)
+			}
+			wg.Done()
+		}(addresses[start:end])
 	}
+
+	wg.Wait()
+
 	return nil
 }
 
