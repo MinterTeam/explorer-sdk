@@ -15,7 +15,7 @@ func (rStake *StakeRepository) CopyFromReader(data io.Reader) error {
 	if err != nil {
 		return err
 	}
-	_, err = pgdriver.CopyFrom(rStake.ctx, conn, data, "COPY table_name FROM STDIN")
+	_, err = pgdriver.CopyFrom(rStake.ctx, conn, data, "COPY stakes FROM STDIN")
 	return err
 }
 
