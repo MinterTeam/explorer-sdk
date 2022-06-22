@@ -12,34 +12,33 @@ import (
 	"testing"
 )
 
-func TestGetStakes(t *testing.T) {
+func TestGetLastBlock(t *testing.T) {
 	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Println(".env file not found")
 	}
 
-	//dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=%s",
-	//	os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"),
-	//	os.Getenv("DB_HOST"), os.Getenv("DB_PORT"),
-	//	os.Getenv("DB_NAME"), os.Getenv("DB_SSL_ENABLED"))
-	//pgconn := pgdriver.NewConnector(pgdriver.WithDSN(dsn))
-
+	var tsl *tls.Config
+	if os.Getenv("DB_SSL_ENABLED") == "true" {
+		tsl = &tls.Config{InsecureSkipVerify: true}
+	}
 	pgconn := pgdriver.NewConnector(
 		pgdriver.WithNetwork("tcp"),
 		pgdriver.WithAddr(fmt.Sprintf("%s:%s", os.Getenv("DB_HOST"), os.Getenv("DB_PORT"))),
-		pgdriver.WithTLSConfig(&tls.Config{InsecureSkipVerify: true}),
+		pgdriver.WithTLSConfig(tsl),
 		pgdriver.WithUser(os.Getenv("DB_USER")),
 		pgdriver.WithPassword(os.Getenv("DB_PASSWORD")),
 		pgdriver.WithDatabase(os.Getenv("DB_NAME")),
 		pgdriver.WithApplicationName("myapp"),
 	)
-	sqldb := sql.OpenDB(pgconn)
+	sqlDB := sql.OpenDB(pgconn)
+	r := NewBlockRepository(sqlDB, pgdialect.New())
 
-	r := NewStakeRepository(sqldb, pgdialect.New())
-
-	count, err := r.GetDelegatorsCount()
-
-	if count == 0 {
+	block, err := r.GetLastFromDB()
+	if err != nil {
+		t.Error(err.Error())
+	}
+	if block == nil {
 		t.Error("empty result")
 	}
 }

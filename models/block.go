@@ -13,7 +13,7 @@ type Block struct {
 	BlockReward         string                `json:"block_reward"         bun:"type:numeric(70)"`
 	Hash                string                `json:"hash"`
 	Proposer            *Validator            `json:"proposer"             bun:"rel:has-one,join:proposer_validator_id=id"` //relation has one to Validators
-	Validators          []*Validator          `json:"validators"           bun:"m2m:block_validator"`                       //relation has many to Validators
+	Validators          []*Validator          `json:"validators"           bun:"m2m:block_validator,join:Block=Validator"`  //relation has many to Validators
 	Transactions        []*Transaction        `json:"transactions"         bun:"rel:has-many"`                              //relation has many to Transactions
 	InvalidTransactions []*InvalidTransaction `json:"invalid_transactions" bun:"rel:has-many"`                              //relation has many to InvalidTransactions
 	Rewards             []*Reward             `json:"rewards"              bun:"rel:has-many"`                              //relation has many to Rewards

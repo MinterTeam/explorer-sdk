@@ -4,8 +4,9 @@ import "github.com/uptrace/bun"
 
 type BlockValidator struct {
 	bun.BaseModel `bun:"table:block_validator"`
-	BlockID       uint64    `json:"block_id"`
-	ValidatorID   uint64    `json:"validator_id"`
-	Signed        bool      `json:"signed"`
-	Validator     Validator `json:"validator" bun:"rel:has-one"`
+	Signed        bool       `json:"signed"`
+	BlockID       uint64     `json:"block_id"     bun:",pk"`
+	Block         *Block     `json:"block"        bun:"rel:belongs-to,join:block_id=id"`
+	ValidatorID   uint64     `json:"validator_id" bun:",pk"`
+	Validator     *Validator `json:"validator"    bun:"rel:belongs-to,join:validator_id=id"`
 }
