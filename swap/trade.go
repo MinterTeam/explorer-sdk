@@ -2,7 +2,7 @@ package swap
 
 import (
 	"errors"
-	"github.com/MinterTeam/minter-explorer-api/v2/helpers"
+	"github.com/MinterTeam/explorer-sdk/helpers"
 	"github.com/ethereum/go-ethereum/params"
 	"math/big"
 	"sync"

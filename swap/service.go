@@ -1,20 +1,23 @@
 package swap
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/MinterTeam/minter-explorer-extender/v2/models"
-	"github.com/go-pg/pg/v10"
+	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/starwander/goraph"
+	"github.com/uptrace/bun"
+	"github.com/uptrace/bun/dialect/pgdialect"
 	"math/big"
 	"sync"
 )
 
 type Service struct {
-	db *pg.DB
+	db *bun.DB
 }
 
-func NewService(db *pg.DB) *Service {
+func NewService(sqlDB *sql.DB, dialect *pgdialect.Dialect) *Service {
+	db := bun.NewDB(sqlDB, dialect)
 	return &Service{db}
 }
 
