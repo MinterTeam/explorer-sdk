@@ -62,6 +62,7 @@ func (rLp *LiquidityPoolRepository) UpdateLiquidityPoolById(lp *models.Liquidity
 		Column("first_coin_volume").
 		Column("second_coin_volume").
 		Column("liquidity").
+		Column("updated_at_block_id").
 		WherePK().
 		Exec(rLp.ctx)
 	return err
