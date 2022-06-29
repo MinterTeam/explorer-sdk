@@ -67,3 +67,8 @@ func StringToBigInt(string string) *big.Int {
 
 	return bInt
 }
+
+func BigFloatToPipString(f *big.Float) string {
+	pip, _ := new(big.Float).Mul(big.NewFloat(1e18), f).Int(nil)
+	return pip.String()
+}
