@@ -8,18 +8,18 @@ import (
 const LockedLiquidityVolume = 1000
 
 type LiquidityPool struct {
-	Id               uint64 `json:"id"                 pg:",pk"`
+	Id               uint64 `json:"id"                 bun:",pk"`
 	TokenId          uint64 `json:"token_id"`
-	FirstCoinId      uint64 `json:"first_coin_id"      pg:",use_zero"`
-	SecondCoinId     uint64 `json:"second_coin_id"     pg:",use_zero"`
-	FirstCoinVolume  string `json:"first_coin_volume"  pg:"type:numeric(100)"`
-	SecondCoinVolume string `json:"second_coin_volume" pg:"type:numeric(100)"`
+	FirstCoinId      uint64 `json:"first_coin_id"`
+	SecondCoinId     uint64 `json:"second_coin_id" `
+	FirstCoinVolume  string `json:"first_coin_volume"  bun:"type:numeric(100)"`
+	SecondCoinVolume string `json:"second_coin_volume" bun:"type:numeric(100)"`
 	Liquidity        string `json:"liquidity"`
 	LiquidityBip     string `json:"liquidity_bip"`
 	UpdatedAtBlockId uint64 `json:"updated_at_block_id"`
-	FirstCoin        *Coin  `json:"first_coin"  pg:"rel:has-one,fk:first_coin_id"`
-	SecondCoin       *Coin  `json:"second_coin" pg:"rel:has-one,fk:second_coin_id"`
-	Token            *Coin  `json:"token"       pg:"rel:has-one,fk:token_id"`
+	FirstCoin        *Coin  `json:"first_coin"  bun:"rel:belongs-to,join:first_coin_id=id"`
+	SecondCoin       *Coin  `json:"second_coin" bun:"rel:belongs-to,join:second_coin_id=id"`
+	Token            *Coin  `json:"token"       bun:"rel:belongs-to,join:token_id=id"`
 }
 
 func (lp *LiquidityPool) GetTokenSymbol() string {
@@ -27,13 +27,13 @@ func (lp *LiquidityPool) GetTokenSymbol() string {
 }
 
 type AddressLiquidityPool struct {
-	LiquidityPoolId  uint64         `json:"liquidity_pool_id" pg:",pk"`
-	AddressId        uint64         `json:"address_id"        pg:",pk"`
-	FirstCoinVolume  string         `json:"first_coin_volume"  pg:"type:numeric(100)"`
-	SecondCoinVolume string         `json:"second_coin_volume" pg:"type:numeric(100)"`
+	LiquidityPoolId  uint64         `json:"liquidity_pool_id"  bun:",pk"`
+	AddressId        uint64         `json:"address_id"         bun:",pk"`
+	FirstCoinVolume  string         `json:"first_coin_volume"  bun:"type:numeric(100)"`
+	SecondCoinVolume string         `json:"second_coin_volume" bun:"type:numeric(100)"`
 	Liquidity        string         `json:"liquidity"`
-	Address          *Address       `json:"address"           pg:"rel:has-one,fk:address_id"`
-	LiquidityPool    *LiquidityPool `json:"liquidity_pool"    pg:"rel:has-one,fk:liquidity_pool_id"`
+	Address          *Address       `json:"address"            bun:"rel:belongs-to"`
+	LiquidityPool    *LiquidityPool `json:"liquidity_pool"     bun:"rel:belongs-to,join:liquidity_pool_id=id"`
 }
 
 type TagLiquidityPool struct {
@@ -61,7 +61,7 @@ type LiquidityPoolTrade struct {
 	FirstCoinVolume  string         `json:"first_coin_volume"`
 	SecondCoinVolume string         `json:"second_coin_volume"`
 	CreatedAt        time.Time      `json:"created_at"`
-	Block            *Block         `json:"block"          pg:"rel:has-one,fk:block_id"`
-	LiquidityPool    *LiquidityPool `json:"liquidity_pool" pg:"rel:has-one,fk:liquidity_pool_id"`
-	Transaction      *Transaction   `json:"transaction"    pg:"rel:has-one,fk:transaction_id"`
+	Block            *Block         `json:"block"          pg:"rel:belongs-to"`
+	LiquidityPool    *LiquidityPool `json:"liquidity_pool" pg:"rel:belongs-to,join:liquidity_pool_id=id"`
+	Transaction      *Transaction   `json:"transaction"    pg:"rel:belongs-to"`
 }
