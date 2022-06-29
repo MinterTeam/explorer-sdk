@@ -1,7 +1,7 @@
 package swap
 
 import (
-	"github.com/MinterTeam/minter-explorer-api/v2/helpers"
+	"github.com/MinterTeam/explorer-sdk/helpers"
 	"math/big"
 	"reflect"
 )
