@@ -1,8 +1,9 @@
 package swap
 
 import (
-	"github.com/MinterTeam/explorer-sdk/helpers"
+	"github.com/MinterTeam/minter-explorer-api/v2/helpers"
 	"math/big"
+	"reflect"
 )
 
 func getVolumeInBip(price *big.Float, volume string) *big.Float {
@@ -17,7 +18,16 @@ func computePrice(reserve1, reserve2 string) *big.Float {
 	)
 }
 
-func str2bigint(string string) *big.Int {
-	bInt, _ := new(big.Int).SetString(string, 10)
-	return bInt
+func inArray(needle interface{}, haystack interface{}) bool {
+	switch reflect.TypeOf(haystack).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(haystack)
+		for i := 0; i < s.Len(); i++ {
+			if reflect.DeepEqual(needle, s.Index(i).Interface()) == true {
+				return true
+			}
+		}
+	}
+
+	return false
 }
