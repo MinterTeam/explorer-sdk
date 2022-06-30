@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"github.com/uptrace/bun"
 	"time"
 )
 
@@ -33,7 +34,7 @@ type Transaction struct {
 }
 
 type TransactionValidator struct {
-	//tableName     struct{}     `pg:"transaction_validator"`
+	bun.BaseModel `bun:"table:transaction_validator"`
 	TransactionID uint64       `bun:",pk"`
 	Transaction   *Transaction `bun:"rel:belongs-to,join:transaction_id=id"`
 	ValidatorID   uint64       `bun:",pk"`
