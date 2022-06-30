@@ -2,10 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"math"
 	"sync"
 )
@@ -267,8 +265,7 @@ type CoinRepository struct {
 	ctx         context.Context
 }
 
-func NewCoinRepository(sqlDB *sql.DB, dialect *pgdialect.Dialect) *CoinRepository {
-	db := bun.NewDB(sqlDB, dialect)
+func NewCoinRepository(db *bun.DB) *CoinRepository {
 	return &CoinRepository{
 		db:          db,
 		symbolCache: new(sync.Map), //TODO: добавить реализацию очистки

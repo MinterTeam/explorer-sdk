@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"log"
@@ -32,7 +33,8 @@ func TestGetLastBlock(t *testing.T) {
 		pgdriver.WithApplicationName("myapp"),
 	)
 	sqlDB := sql.OpenDB(pgconn)
-	r := NewBlockRepository(sqlDB, pgdialect.New())
+	db := bun.NewDB(sqlDB, pgdialect.New())
+	r := NewBlockRepository(db)
 
 	block, err := r.GetLastFromDB()
 	if err != nil {

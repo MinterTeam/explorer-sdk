@@ -2,10 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"time"
 )
 
@@ -32,8 +30,8 @@ type RewardRepository struct {
 	db *bun.DB
 }
 
-func NewRewardRepository(sqldb *sql.DB, dialect *pgdialect.Dialect) *RewardRepository {
+func NewRewardRepository(db *bun.DB) *RewardRepository {
 	return &RewardRepository{
-		db: bun.NewDB(sqldb, dialect),
+		db: db,
 	}
 }

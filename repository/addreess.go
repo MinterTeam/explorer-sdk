@@ -2,10 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"math"
 	"sync"
 )
@@ -107,10 +105,10 @@ type AddressRepository struct {
 	addressCache *sync.Map
 }
 
-func NewAddressRepository(sqldb *sql.DB, dialect *pgdialect.Dialect) *AddressRepository {
+func NewAddressRepository(db *bun.DB) *AddressRepository {
 	return &AddressRepository{
 		idCache:      new(sync.Map),
 		addressCache: new(sync.Map),
-		db:           bun.NewDB(sqldb, dialect),
+		db:           db,
 	}
 }

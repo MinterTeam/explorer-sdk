@@ -2,11 +2,9 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"time"
 )
 
@@ -204,8 +202,7 @@ type LiquidityPoolRepository struct {
 	ctx context.Context
 }
 
-func NewLiquidityPoolRepository(sqlDB *sql.DB, dialect *pgdialect.Dialect) *LiquidityPoolRepository {
-	db := bun.NewDB(sqlDB, dialect)
+func NewLiquidityPoolRepository(db *bun.DB) *LiquidityPoolRepository {
 	return &LiquidityPoolRepository{
 		db:  db,
 		ctx: context.Background(),

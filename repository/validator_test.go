@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/joho/godotenv"
+	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"log"
@@ -13,7 +14,7 @@ import (
 
 func TestValidatorFindByPk(t *testing.T) {
 
-	pk := "e782c9a2c62f085f4d1bedf307de525b13226c20c597e66b0cf246a061f31b2d"
+	pk := ""
 
 	err := godotenv.Load("../.env")
 	if err != nil {
@@ -29,13 +30,15 @@ func TestValidatorFindByPk(t *testing.T) {
 		pgdriver.WithDatabase(os.Getenv("DB_NAME")),
 		pgdriver.WithApplicationName("Explorer SDK Test"),
 	)
-	sqldb := sql.OpenDB(pgconn)
-	err = sqldb.Ping()
+	sqlDB := sql.OpenDB(pgconn)
+	err = sqlDB.Ping()
 	if err != nil {
 		t.Error(err)
 	}
 
-	r := NewValidatorRepository(sqldb, pgdialect.New())
+	db := bun.NewDB(sqlDB, pgdialect.New())
+
+	r := NewValidatorRepository(db)
 
 	v, err := r.FindByPk(pk)
 

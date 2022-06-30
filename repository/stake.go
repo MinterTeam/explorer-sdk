@@ -2,10 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"github.com/uptrace/bun/driver/pgdriver"
 	"io"
 )
@@ -42,9 +40,9 @@ type StakeRepository struct {
 	ctx context.Context
 }
 
-func NewStakeRepository(sqldb *sql.DB, dialect *pgdialect.Dialect) *StakeRepository {
+func NewStakeRepository(db *bun.DB) *StakeRepository {
 	return &StakeRepository{
-		db:  bun.NewDB(sqldb, dialect),
+		db:  db,
 		ctx: context.Background(),
 	}
 }

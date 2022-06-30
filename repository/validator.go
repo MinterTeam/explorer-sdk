@@ -2,10 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"sync"
 )
 
@@ -64,9 +62,9 @@ type ValidatorRepository struct {
 	db      *bun.DB
 }
 
-func NewValidatorRepository(sqldb *sql.DB, dialect *pgdialect.Dialect) *ValidatorRepository {
+func NewValidatorRepository(db *bun.DB) *ValidatorRepository {
 	return &ValidatorRepository{
 		pkCache: new(sync.Map),
-		db:      bun.NewDB(sqldb, dialect),
+		db:      db,
 	}
 }

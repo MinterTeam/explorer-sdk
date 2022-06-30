@@ -2,11 +2,9 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/MinterTeam/explorer-sdk/helpers"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
 func (rTransaction *TransactionRepository) GetByHash(hash string) (*models.Transaction, error) {
@@ -27,9 +25,9 @@ type TransactionRepository struct {
 	ctx context.Context
 }
 
-func NewTransactionRepository(sqlDB *sql.DB, dialect *pgdialect.Dialect) *TransactionRepository {
-	db := bun.NewDB(sqlDB, dialect)
-	db.RegisterModel((*models.TransactionValidator)(nil))
+func NewTransactionRepository(db *bun.DB) *TransactionRepository {
+	//db := bun.NewDB(sqlDB, dialect)
+	//db.RegisterModel((*models.TransactionValidator)(nil))
 	return &TransactionRepository{
 		db:  db,
 		ctx: context.Background(),

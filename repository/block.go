@@ -2,10 +2,8 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 )
 
 func (rBlock *BlockRepository) Save(block *models.Block) error {
@@ -55,9 +53,9 @@ type BlockRepository struct {
 	ctx context.Context
 }
 
-func NewBlockRepository(sqlDB *sql.DB, dialect *pgdialect.Dialect) *BlockRepository {
-	db := bun.NewDB(sqlDB, dialect)
-	db.RegisterModel((*models.BlockValidator)(nil))
+func NewBlockRepository(db *bun.DB) *BlockRepository {
+	//db := bun.NewDB(sqlDB, dialect)
+	//db.RegisterModel((*models.BlockValidator)(nil))
 	return &BlockRepository{
 		db:  db,
 		ctx: context.Background(),
