@@ -109,7 +109,11 @@ func (rLp *LiquidityPoolRepository) GetLiquidityPoolById(id uint64) (*models.Liq
 }
 
 func (rLp *LiquidityPoolRepository) UpdateLiquidityPool(lp *models.LiquidityPool) error {
-	_, err := rLp.db.NewInsert().Model(lp).On("CONFLICT (first_coin_id, second_coin_id) DO UPDATE").Exec(rLp.ctx)
+	_, err := rLp.db.NewInsert().
+		Model(lp).
+		ExcludeColumn("created_at_block_id").
+		On("CONFLICT (first_coin_id, second_coin_id) DO UPDATE").
+		Exec(rLp.ctx)
 	return err
 }
 
