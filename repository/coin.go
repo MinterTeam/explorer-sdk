@@ -47,12 +47,13 @@ func (rCoin *CoinRepository) UpdateOwnerBySymbol(symbol string, id uint) error {
 	return err
 }
 
-func (rCoin *CoinRepository) UpdateAll(coins []*models.Coin) error {
+func (rCoin *CoinRepository) BulkUpdateReserveAndVolume(coins []*models.Coin) error {
 
 	list := coins
 
 	_, err := rCoin.db.NewUpdate().
 		Model(&list).
+		Column("reserve", "volume").
 		WherePK().
 		Bulk().
 		Exec(rCoin.ctx)
