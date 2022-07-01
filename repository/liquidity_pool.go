@@ -54,6 +54,20 @@ func (rLp *LiquidityPoolRepository) GetLastUpdateHeight() (uint64, error) {
 	return lp.UpdatedAtBlockId, err
 }
 
+func (rLp *LiquidityPoolRepository) GetLastCreateHeight() (uint64, error) {
+	var lp = new(models.LiquidityPool)
+	err := rLp.db.
+		NewSelect().
+		Model(lp).
+		Order("created_at_block_id desc").
+		Limit(1).
+		Scan(rLp.ctx)
+	if err != nil {
+		return 0, err
+	}
+	return lp.CreatedAtBlockId, err
+}
+
 func (rLp *LiquidityPoolRepository) GetLiquidityPoolByCoinIds(firstCoinId, secondCoinId uint64) (*models.LiquidityPool, error) {
 	var lp = new(models.LiquidityPool)
 	err := rLp.db.

@@ -16,6 +16,7 @@ type LiquidityPool struct {
 	SecondCoinVolume string `json:"second_coin_volume" bun:"type:numeric(100)"`
 	Liquidity        string `json:"liquidity"`
 	LiquidityBip     string `json:"liquidity_bip"`
+	CreatedAtBlockId uint64 `json:"created_at_block_id"`
 	UpdatedAtBlockId uint64 `json:"updated_at_block_id"`
 	FirstCoin        *Coin  `json:"first_coin"  bun:"rel:belongs-to,join:first_coin_id=id"`
 	SecondCoin       *Coin  `json:"second_coin" bun:"rel:belongs-to,join:second_coin_id=id"`
