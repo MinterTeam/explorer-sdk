@@ -2,11 +2,43 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
+	"strconv"
+	"strings"
 	"time"
 )
+
+func (rLp *LiquidityPoolRepository) GetPoolByPairString(pair string) (*models.LiquidityPool, error) {
+	ids := strings.Split(pair, "-")
+	firstCoinId, err := strconv.ParseUint(ids[0], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	secondCoinId, err := strconv.ParseUint(ids[1], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	if firstCoinId < secondCoinId {
+		return rLp.GetLiquidityPoolByCoinIds(firstCoinId, secondCoinId)
+	} else {
+		return rLp.GetLiquidityPoolByCoinIds(secondCoinId, firstCoinId)
+	}
+}
+
+func (rLp *LiquidityPoolRepository) GetPoolsByTxTags(tags map[string]string) ([]models.LiquidityPool, error) {
+	pools, err := rLp.getPoolChainFromTags(tags)
+	if err != nil {
+		return nil, err
+	}
+	var idList []uint64
+	for id := range pools {
+		idList = append(idList, id)
+	}
+	return rLp.GetAllByIds(idList)
+}
 
 func (rLp *LiquidityPoolRepository) GetLastUpdateHeight() (uint64, error) {
 	var lp = new(models.LiquidityPool)
@@ -195,6 +227,28 @@ func (rLp *LiquidityPoolRepository) RemoveEmptyAddresses() error {
 		Where("liquidity <= 0").
 		Exec(rLp.ctx)
 	return err
+}
+
+func (rLp *LiquidityPoolRepository) getPoolChainFromTags(tags map[string]string) (map[uint64][]map[string]string, error) {
+	var poolsData []models.TagLiquidityPool
+	err := json.Unmarshal([]byte(tags["tx.pools"]), &poolsData)
+	if err != nil {
+		return nil, err
+	}
+
+	data := make(map[uint64][]map[string]string)
+	for _, p := range poolsData {
+		firstCoinData := make(map[string]string)
+		firstCoinData["coinId"] = fmt.Sprintf("%d", p.CoinIn)
+		firstCoinData["volume"] = p.ValueIn
+
+		secondCoinData := make(map[string]string)
+		secondCoinData["coinId"] = fmt.Sprintf("%d", p.CoinOut)
+		secondCoinData["volume"] = p.ValueIn
+
+		data[p.PoolID] = []map[string]string{firstCoinData, secondCoinData}
+	}
+	return data, nil
 }
 
 type LiquidityPoolRepository struct {

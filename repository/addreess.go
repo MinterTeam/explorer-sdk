@@ -2,9 +2,12 @@ package repository
 
 import (
 	"context"
+	"database/sql"
+	"github.com/MinterTeam/explorer-sdk/helpers"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/uptrace/bun"
 	"math"
+	"strings"
 	"sync"
 )
 
@@ -92,6 +95,36 @@ func (rAddress *AddressRepository) UpdateCache() error {
 	return nil
 }
 
+func (rAddress *AddressRepository) FindIdOrCreate(addressString string) (models.Address, error) {
+	a, err := rAddress.GetByAddress(helpers.RemovePrefix(strings.ToLower(addressString)))
+
+	if err != nil && err != sql.ErrNoRows {
+		return models.Address{}, err
+	}
+
+	if err != nil && err == sql.ErrNoRows {
+		return rAddress.Create(addressString)
+	}
+	return a, err
+}
+
+func (rAddress *AddressRepository) Create(a string) (models.Address, error) {
+	address := models.Address{
+		Address: helpers.RemovePrefix(strings.ToLower(a)),
+	}
+	_, err := rAddress.db.NewInsert().
+		Model(&address).
+		Exec(rAddress.ctx)
+
+	if err != nil {
+		return models.Address{}, err
+	}
+
+	rAddress.idCache.Store(address.ID, address)
+	rAddress.addressCache.Store(address.Address, address)
+	return address, nil
+}
+
 func (rAddress *AddressRepository) Init() {
 	err := rAddress.UpdateCache()
 	if err != nil {
@@ -103,6 +136,7 @@ type AddressRepository struct {
 	db           *bun.DB
 	idCache      *sync.Map
 	addressCache *sync.Map
+	ctx          context.Context
 }
 
 func NewAddressRepository(db *bun.DB) *AddressRepository {
@@ -110,5 +144,6 @@ func NewAddressRepository(db *bun.DB) *AddressRepository {
 		idCache:      new(sync.Map),
 		addressCache: new(sync.Map),
 		db:           db,
+		ctx:          context.Background(),
 	}
 }
