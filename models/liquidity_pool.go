@@ -61,7 +61,7 @@ type LiquidityPoolTrade struct {
 	FirstCoinVolume  string         `json:"first_coin_volume"`
 	SecondCoinVolume string         `json:"second_coin_volume"`
 	CreatedAt        time.Time      `json:"created_at"`
-	Block            *Block         `json:"block"          pg:"rel:belongs-to"`
-	LiquidityPool    *LiquidityPool `json:"liquidity_pool" pg:"rel:belongs-to,join:liquidity_pool_id=id"`
-	Transaction      *Transaction   `json:"transaction"    pg:"rel:belongs-to"`
+	Block            *Block         `json:"block"          bun:"rel:belongs-to"`
+	LiquidityPool    *LiquidityPool `json:"liquidity_pool" bun:"rel:belongs-to,join:liquidity_pool_id=id"`
+	Transaction      *Transaction   `json:"transaction"    bun:"rel:belongs-to"`
 }
