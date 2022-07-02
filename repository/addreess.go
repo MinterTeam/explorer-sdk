@@ -11,6 +11,40 @@ import (
 	"sync"
 )
 
+func (rAddress *AddressRepository) SaveAll(addresses []string) ([]models.Address, error) {
+	var list []models.Address
+	for _, a := range addresses {
+		_, ok := rAddress.addressCache.Load(a)
+		if ok {
+			continue
+		}
+		list = append(list, models.Address{
+			Address: a,
+		})
+	}
+
+	if len(list) == 0 {
+		return nil, nil
+	}
+
+	_, err := rAddress.db.
+		NewInsert().
+		Model(&list).
+		On("CONFLICT (address) DO NOTHING").
+		Exec(rAddress.ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, a := range list {
+		rAddress.idCache.Store(a.ID, a)
+		rAddress.addressCache.Store(a.Address, a)
+	}
+
+	return list, err
+}
+
 func (rAddress *AddressRepository) GetByAddress(addressString string) (models.Address, error) {
 	a, ok := rAddress.addressCache.Load(addressString)
 	if ok {
