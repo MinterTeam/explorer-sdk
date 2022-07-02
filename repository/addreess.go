@@ -14,12 +14,12 @@ import (
 func (rAddress *AddressRepository) SaveAll(addresses []string) ([]models.Address, error) {
 	var list []models.Address
 	for _, a := range addresses {
-		_, ok := rAddress.addressCache.Load(a)
+		_, ok := rAddress.addressCache.Load(helpers.RemovePrefix(strings.ToLower(a)))
 		if ok {
 			continue
 		}
 		list = append(list, models.Address{
-			Address: a,
+			Address: helpers.RemovePrefix(strings.ToLower(a)),
 		})
 	}
 
@@ -46,7 +46,7 @@ func (rAddress *AddressRepository) SaveAll(addresses []string) ([]models.Address
 }
 
 func (rAddress *AddressRepository) GetByAddress(addressString string) (models.Address, error) {
-	a, ok := rAddress.addressCache.Load(addressString)
+	a, ok := rAddress.addressCache.Load(helpers.RemovePrefix(strings.ToLower(addressString)))
 	if ok {
 		return a.(models.Address), nil
 	}
@@ -55,8 +55,8 @@ func (rAddress *AddressRepository) GetByAddress(addressString string) (models.Ad
 	err := rAddress.db.
 		NewSelect().
 		Model(&address).
-		Where("address = ?", addressString).
-		Scan(context.Background())
+		Where("address = ?", helpers.RemovePrefix(strings.ToLower(addressString))).
+		Scan(rAddress.ctx)
 
 	if err != nil {
 		return models.Address{}, err
@@ -78,7 +78,7 @@ func (rAddress *AddressRepository) GetById(id uint) (models.Address, error) {
 		NewSelect().
 		Model(&address).
 		Where("id = ?", id).
-		Scan(context.Background())
+		Scan(rAddress.ctx)
 
 	if err != nil {
 		return models.Address{}, err
@@ -94,7 +94,7 @@ func (rAddress *AddressRepository) UpdateCache() error {
 	err := rAddress.db.
 		NewSelect().
 		Model(&addresses).
-		Scan(context.Background())
+		Scan(rAddress.ctx)
 
 	if err != nil {
 		return err
