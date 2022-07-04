@@ -1,22 +1,17 @@
 package swap
 
 import (
-	"database/sql"
 	"errors"
 	"github.com/MinterTeam/explorer-sdk/models"
 	"github.com/starwander/goraph"
-	"github.com/uptrace/bun"
-	"github.com/uptrace/bun/dialect/pgdialect"
 	"math/big"
 )
 
 type Service struct {
-	db *bun.DB
 }
 
-func NewService(sqlDB *sql.DB, dialect *pgdialect.Dialect) *Service {
-	db := bun.NewDB(sqlDB, dialect)
-	return &Service{db}
+func NewService() *Service {
+	return &Service{}
 }
 
 func (s *Service) GetPoolLiquidity(pools []models.LiquidityPool, p models.LiquidityPool, trackedCoinIds []uint64) *big.Float {
@@ -80,22 +75,10 @@ func (s *Service) GetPoolLiquidity(pools []models.LiquidityPool, p models.Liquid
 func (s *Service) FindSwapRoutePathsByGraph(pools []models.LiquidityPool, fromCoinId, toCoinId uint64, depth int, topk int) ([][]goraph.ID, error) {
 	graph := goraph.NewGraph()
 	for _, pool := range pools {
-		err := graph.AddVertex(pool.FirstCoinId, pool.FirstCoin)
-		if err != nil {
-			return nil, err
-		}
-		err = graph.AddVertex(pool.SecondCoinId, pool.SecondCoin)
-		if err != nil {
-			return nil, err
-		}
-		err = graph.AddEdge(pool.FirstCoinId, pool.SecondCoinId, 1, nil)
-		if err != nil {
-			return nil, err
-		}
-		err = graph.AddEdge(pool.SecondCoinId, pool.FirstCoinId, 1, nil)
-		if err != nil {
-			return nil, err
-		}
+		graph.AddVertex(pool.FirstCoinId, pool.FirstCoin)
+		graph.AddVertex(pool.SecondCoinId, pool.SecondCoin)
+		graph.AddEdge(pool.FirstCoinId, pool.SecondCoinId, 1, nil)
+		graph.AddEdge(pool.SecondCoinId, pool.FirstCoinId, 1, nil)
 	}
 
 	_, paths, err := graph.Yen(fromCoinId, toCoinId, topk)
