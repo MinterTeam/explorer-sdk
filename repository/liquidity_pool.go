@@ -217,7 +217,7 @@ func (rLp *LiquidityPoolRepository) GetAllByIds(ids []uint64) ([]models.Liquidit
 		Model(&list).
 		Relation("FirstCoin").
 		Relation("SecondCoin").
-		Where("id in (?)", bun.In(ids)).
+		Where("liquidity_pool.id in (?)", bun.In(ids)).
 		Scan(rLp.ctx)
 	return list, err
 }
