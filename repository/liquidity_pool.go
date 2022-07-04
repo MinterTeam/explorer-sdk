@@ -190,6 +190,19 @@ func (rLp *LiquidityPoolRepository) DeleteAddressLiquidityPool(addressId uint, l
 	return err
 }
 
+func (rLp *LiquidityPoolRepository) UpdateBipValue(lpId uint64, bipValue string) error {
+	value := map[string]interface{}{
+		"liquidity_bip": bipValue,
+	}
+	_, err := rLp.db.NewUpdate().
+		Model(&value).
+		TableExpr("liquidity_pools").
+		Where("id = ?", lpId).
+		Exec(rLp.ctx)
+
+	return err
+}
+
 func (rLp *LiquidityPoolRepository) UpdateAllLiquidityPool(pools []*models.AddressLiquidityPool) error {
 	_, err := rLp.db.
 		NewInsert().

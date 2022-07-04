@@ -80,7 +80,7 @@ func (rCoin *CoinRepository) Update(c *models.Coin) error {
 	return err
 }
 
-func (rCoin *CoinRepository) SaveAllNewIfNotExist(coins []*models.Coin) error {
+func (rCoin *CoinRepository) SaveAll(coins []models.Coin) error {
 	list := coins
 	_, err := rCoin.db.NewInsert().
 		Model(&list).
