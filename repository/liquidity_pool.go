@@ -213,7 +213,12 @@ func (rLp *LiquidityPoolRepository) UpdateAllLiquidityPool(pools []*models.Addre
 
 func (rLp *LiquidityPoolRepository) GetAllByIds(ids []uint64) ([]models.LiquidityPool, error) {
 	var list []models.LiquidityPool
-	err := rLp.db.NewSelect().Model(&list).Where("id in (?)", bun.In(ids)).Scan(rLp.ctx)
+	err := rLp.db.NewSelect().
+		Model(&list).
+		Relation("FirstCoin").
+		Relation("SecondCoin").
+		Where("id in (?)", bun.In(ids)).
+		Scan(rLp.ctx)
 	return list, err
 }
 
@@ -224,7 +229,11 @@ func (rLp *LiquidityPoolRepository) SaveAllLiquidityPoolTrades(links []*models.L
 
 func (rLp *LiquidityPoolRepository) GetAll() ([]models.LiquidityPool, error) {
 	var list []models.LiquidityPool
-	err := rLp.db.NewSelect().Model(&list).Scan(rLp.ctx)
+	err := rLp.db.NewSelect().
+		Model(&list).
+		Relation("FirstCoin").
+		Relation("SecondCoin").
+		Scan(rLp.ctx)
 	return list, err
 }
 
