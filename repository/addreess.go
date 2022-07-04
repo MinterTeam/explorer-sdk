@@ -11,6 +11,19 @@ import (
 	"sync"
 )
 
+func (rAddress *AddressRepository) GetWithoutBalance() ([]models.Address, error) {
+	var addresses []models.Address
+	err := rAddress.db.
+		NewSelect().
+		Model(&addresses).
+		ColumnExpr("address.*").
+		Join("LEFT JOIN balances as b ON address.id = b.address_id").
+		Where("b.address_id IS NULL").
+		Scan(rAddress.ctx)
+
+	return addresses, err
+}
+
 func (rAddress *AddressRepository) SaveAll(addresses []string) ([]models.Address, error) {
 	var list []models.Address
 	for _, a := range addresses {
