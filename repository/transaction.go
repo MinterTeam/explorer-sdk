@@ -8,6 +8,22 @@ import (
 	"strings"
 )
 
+func (rTransaction *TransactionRepository) LinkWithLiquidityPool(links []*models.TransactionLiquidityPool) error {
+	list := links
+	_, err := rTransaction.db.NewInsert().
+		Model(&list).
+		Exec(rTransaction.ctx)
+	return err
+}
+
+func (rTransaction *TransactionRepository) LinkWithValidators(links []*models.TransactionValidator) error {
+	list := links
+	_, err := rTransaction.db.NewInsert().
+		Model(&list).
+		Exec(rTransaction.ctx)
+	return err
+}
+
 func (rTransaction *TransactionRepository) SaveInvalid(tx *models.InvalidTransaction) (*models.InvalidTransaction, error) {
 	_, err := rTransaction.db.NewInsert().
 		Model(tx).
